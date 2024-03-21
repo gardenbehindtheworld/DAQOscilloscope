@@ -15,17 +15,7 @@ namespace DAQOscilloscope
 {
     public partial class Frm1 : Form
     {
-        // DAQ analog read setup
-        private NationalInstruments.DAQmx.Task analogReadTask;
-        private AnalogMultiChannelReader reader;
-
-        // User-specified analog read settings
-        private double minimumVoltage;
-        private double maximumVoltage;
-        private AITerminalConfiguration terminalConfig;
-
-        // Data collection
-        private double[,] data;
+        private Oscilloscope osc;
 
         // DAQ board specs
         private const double MAX_TIME = 9.0; // seconds
@@ -39,6 +29,8 @@ namespace DAQOscilloscope
 
         private void Frm1_Load(object sender, EventArgs e)
         {
+            osc = new Oscilloscope();
+
             // Start with an empty chart
             chOscilloscope.Series.Clear();
 
@@ -116,20 +108,16 @@ namespace DAQOscilloscope
             switch (cboVoltageRange.SelectedIndex)
             {
                 case 0:
-                    minimumVoltage = -10.0;
-                    maximumVoltage = 10.0;
+                    osc.SetVoltageRange(-10.0, 10.0);
                     break;
                 case 1:
-                    minimumVoltage = -5.0;
-                    maximumVoltage = 5.0;
+                    osc.SetVoltageRange(-5.0, 5.0);
                     break;
                 case 2:
-                    minimumVoltage = -1.0;
-                    maximumVoltage = 1.0;
+                    osc.SetVoltageRange(-1.0, 1.0);
                     break;
                 default:
-                    minimumVoltage = -0.2;
-                    maximumVoltage = 0.2;
+                    osc.SetVoltageRange(-0.2, 0.2);
                     break;
             }
         }
@@ -142,13 +130,13 @@ namespace DAQOscilloscope
             switch (cboTerminalConfig.SelectedIndex)
             {
                 case 0:
-                    terminalConfig = AITerminalConfiguration.Nrse;
+                    osc.TerminalConfig = AITerminalConfiguration.Nrse;
                     break;
                 case 1:
-                    terminalConfig = AITerminalConfiguration.Rse;
+                    osc.TerminalConfig = AITerminalConfiguration.Rse;
                     break;
                 default:
-                    terminalConfig = AITerminalConfiguration.Differential;
+                    osc.TerminalConfig = AITerminalConfiguration.Differential;
                     break;
             }
         }
@@ -171,12 +159,12 @@ namespace DAQOscilloscope
             lblAcquisitionTimeNum.Text = String.Format("{0:0.00}", acquisitionTime);
         }
 
-        private void BtnClearChart_Click(object sender, EventArgs e)
+        private void MnuChartClear_Click(object sender, EventArgs e)
         {
             chOscilloscope.Series.Clear();
         }
 
-        private void BtnAcquire_Click(object sender, EventArgs e)
+        private void MnuAcquireBegin_Click(object sender, EventArgs e)
         {
             if (CalcAcquisitionTime() > MAX_TIME)
             {
@@ -186,7 +174,7 @@ namespace DAQOscilloscope
             {
                 MessageBox.Show($"A/D rate must be limited to {MAX_AD_RATE} S/s.");
             }
-            else if (terminalConfig == AITerminalConfiguration.Differential &&
+            else if (osc.TerminalConfig == AITerminalConfiguration.Differential &&
                 (int)updHighChannel.Value + 1 > GetDaqChannels().Length / 2)
             {
                 MessageBox.Show($"Only the first {GetDaqChannels().Length / 2} " +
@@ -194,61 +182,9 @@ namespace DAQOscilloscope
             }
             else
             {
-                analogReadTask = new NationalInstruments.DAQmx.Task();
                 SetUserInputEnabled(false);
+                osc.Acquire(GetDaqChannels(), GetSelectedChannels());
                 chOscilloscope.Series.Clear();
-
-                string[] channelArray = GetDaqChannels();
-
-                if (channelArray.Length == 0)
-                {
-                    MessageBox.Show("There are no available input channels.");
-                }
-                else
-                {
-                    string[] selChannelArray = GetSelectedChannels();
-
-                    foreach (string channel in selChannelArray)
-                    {
-                        try
-                        {
-                            /* Create a channel that uses the appropriate channel name,
-                             * terminal config, and voltage range
-                             */
-                            analogReadTask.AIChannels.CreateVoltageChannel(
-                                channel, "", this.terminalConfig,
-                                this.minimumVoltage, this.maximumVoltage, AIVoltageUnits.Volts);
-                        }
-                        catch (DaqException ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                        }
-
-                        /* Add a series to the chart for each channel added
-                         */
-                        chOscilloscope.Series.Add(channel);
-                        chOscilloscope.Series[channel].ChartType =
-                            System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    }
-
-                    try
-                    {
-                        // Set up task and reader for data collection
-                        analogReadTask.Timing.ConfigureSampleClock(
-                            string.Empty, (double)updSampleRate.Value,
-                            SampleClockActiveEdge.Falling, SampleQuantityMode.FiniteSamples);
-                        analogReadTask.Timing.SamplesPerChannel = (int)updSamplesPerChannel.Value;
-                        reader = new AnalogMultiChannelReader(analogReadTask.Stream);
-
-                        // Data collection
-                        IAsyncResult readerResult = reader.BeginReadMultiSample(
-                            (int)updSamplesPerChannel.Value, new AsyncCallback(PlotData), null);
-                        this.data = reader.EndReadMultiSample(readerResult);
-                    }
-                    catch (DaqException ex) { MessageBox.Show(ex.Message); }
-                }
-
-                analogReadTask?.Dispose();
                 SetUserInputEnabled(true);
             }
         }
@@ -258,8 +194,8 @@ namespace DAQOscilloscope
             chOscilloscope.ChartAreas[0].AxisX.Title = "Time (s)";
             chOscilloscope.ChartAreas[0].AxisY.Title = "Voltage (V)";
             chOscilloscope.ChartAreas[0].AxisX.Minimum = 0;
-            chOscilloscope.ChartAreas[0].AxisY.Minimum = minimumVoltage * 1.1;
-            chOscilloscope.ChartAreas[0].AxisY.Maximum = maximumVoltage * 1.1;
+            chOscilloscope.ChartAreas[0].AxisY.Minimum = osc.MinimumVoltage * 1.1;
+            chOscilloscope.ChartAreas[0].AxisY.Maximum = osc.MaximumVoltage * 1.1;
 
             chOscilloscope.Titles.Clear();
             chOscilloscope.Titles.Add("Voltage vs Time");
@@ -267,9 +203,9 @@ namespace DAQOscilloscope
             int i = 0;
             foreach (string channel in GetSelectedChannels())
             {
-                for (int j = 0; j < data.GetLength(1); j++)
+                for (int j = 0; j < osc.Data.GetLength(1); j++)
                 {
-                    chOscilloscope.Series[channel].Points.AddXY(times[j], data[i, j]);
+                    chOscilloscope.Series[channel].Points.AddXY(times[j], osc.Data[i, j]);
                 }
                 i++;
             }
@@ -277,7 +213,7 @@ namespace DAQOscilloscope
 
         private double[] GetTimeAxisValues()
         {
-            int dataLength = data.GetLength(1);
+            int dataLength = osc.Data.GetLength(1);
             double[] times = new double[dataLength];
             double stopTime = CalcAcquisitionTime();
 
@@ -343,13 +279,11 @@ namespace DAQOscilloscope
             cboVoltageRange.Refresh();
             updSampleRate.Enabled = enableDisable;
             updSamplesPerChannel.Enabled = enableDisable;
-            btnAcquire.Enabled = enableDisable;
-            btnClearChart.Enabled = enableDisable;
         }
 
         private void Frm1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            analogReadTask?.Dispose();
+            osc.DisposeTask();
         }
     }
 }
