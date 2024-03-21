@@ -152,9 +152,11 @@ namespace DAQOscilloscope
             updLowChannel.Maximum = updHighChannel.Value;
             updHighChannel.Minimum = updLowChannel.Value;
 
+            osc.SampleRate = (int)updSampleRate.Value;
+            osc.SamplesPerChannel = (int)updSamplesPerChannel.Value;
+
             // Set output values
             double acquisitionTime = CalcAcquisitionTime();
-            int numChannels = CalcNumChannels();
             lblADRateNum.Text = CalcADRate().ToString();
             lblAcquisitionTimeNum.Text = String.Format("{0:0.00}", acquisitionTime);
         }
@@ -185,11 +187,12 @@ namespace DAQOscilloscope
                 SetUserInputEnabled(false);
                 osc.Acquire(GetDaqChannels(), GetSelectedChannels());
                 chOscilloscope.Series.Clear();
+                PlotData();
                 SetUserInputEnabled(true);
             }
         }
 
-        private void PlotData(IAsyncResult _)
+        private void PlotData()
         {
             chOscilloscope.ChartAreas[0].AxisX.Title = "Time (s)";
             chOscilloscope.ChartAreas[0].AxisY.Title = "Voltage (V)";
@@ -203,6 +206,12 @@ namespace DAQOscilloscope
             int i = 0;
             foreach (string channel in GetSelectedChannels())
             {
+                /* Add a series to the chart for each channel added
+                 */
+                chOscilloscope.Series.Add(channel);
+                chOscilloscope.Series[channel].ChartType =
+                    System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+
                 for (int j = 0; j < osc.Data.GetLength(1); j++)
                 {
                     chOscilloscope.Series[channel].Points.AddXY(times[j], osc.Data[i, j]);

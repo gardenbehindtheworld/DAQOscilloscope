@@ -16,7 +16,7 @@ namespace DAQOscilloscope
 
         // User-specified analog read settings
         public double MinimumVoltage { get; private set; }
-        public double MaximumVoltage { get; private set; };
+        public double MaximumVoltage { get; private set; }
         public AITerminalConfiguration TerminalConfig { get; set; }
 
         // Data collection
@@ -56,12 +56,6 @@ namespace DAQOscilloscope
                     {
                         MessageBox.Show(ex.Message);
                     }
-
-                    /* Add a series to the chart for each channel added
-                     */
-                    chOscilloscope.Series.Add(channel);
-                    chOscilloscope.Series[channel].ChartType =
-                        System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                 }
 
                 try
@@ -75,7 +69,7 @@ namespace DAQOscilloscope
 
                     // Data collection
                     IAsyncResult readerResult = reader.BeginReadMultiSample(
-                        SamplesPerChannel, new AsyncCallback(PlotData), null);
+                        SamplesPerChannel, null, null);
                     Data = reader.EndReadMultiSample(readerResult);
                 }
                 catch (DaqException ex) { MessageBox.Show(ex.Message); }
