@@ -80,7 +80,7 @@ namespace DAQOscilloscope
                 cboDevice.SelectedIndex = 0;
             }
 
-            //analogReadTask.AIChannels.CreateVoltageChannel()
+            sfdData.Filter = "CSV File|*.csv|All Files|*.*";
         }
 
         private void UpdSampleRate_ValueChanged(object sender, EventArgs e)
@@ -293,6 +293,36 @@ namespace DAQOscilloscope
         private void Frm1_FormClosed(object sender, FormClosedEventArgs e)
         {
             osc.DisposeTask();
+        }
+
+        private void MnuFileSaveNew_Click(object sender, EventArgs e)
+        {
+            sfdData.ShowDialog();
+        }
+
+        private void SfdData_FileOk(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                System.IO.StreamWriter objWriter = new System.IO.StreamWriter(sfdData.FileName);
+
+                // Write row of data
+                for (int i = 0; i < osc.Data.GetLength(1); i++)
+                {
+                    objWriter.Write($"{(double)i / osc.SampleRate},");
+                    // Write columns of data
+                    for (int j = 0; j < osc.Data.GetLength(0); j++)
+                    {
+                        objWriter.Write($"{osc.Data[j, i]},");
+                    }
+                    objWriter.Write("\r\n");
+                }
+
+                objWriter.Close();
+            }
+            catch (System.IO.IOException ex) {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
