@@ -306,6 +306,19 @@ namespace DAQOscilloscope
             {
                 System.IO.StreamWriter objWriter = new System.IO.StreamWriter(sfdData.FileName);
 
+                // File header
+                objWriter.WriteLine($"Date,{osc.DataStartDate}");
+                objWriter.WriteLine($"Time,{osc.DataStartTime}");
+                objWriter.WriteLine($"# Data Points,{osc.Data.GetLength(1)}");
+
+                // Column headers
+                objWriter.Write("Elapsed Time,");
+                for (int i = 0; i < osc.DataChannels.Length; i++)
+                {
+                    objWriter.Write($"{osc.DataChannels[i]},");
+                }
+                objWriter.Write("\r\n");
+
                 // Write row of data
                 for (int i = 0; i < osc.Data.GetLength(1); i++)
                 {

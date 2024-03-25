@@ -21,6 +21,9 @@ namespace DAQOscilloscope
 
         // Data collection
         public double[,] Data { get; private set; }
+        public DateTime DataStartDate { get; private set; }
+        public TimeSpan DataStartTime { get; private set; }
+        public string[] DataChannels { get; private set; }
 
         public int SamplesPerChannel { get; set; }
         public int SampleRate { get; set; }
@@ -40,6 +43,9 @@ namespace DAQOscilloscope
             }
             else
             {
+                DataChannels = selChannelArray;
+                DataStartDate = DateTime.Now.Date;
+                DataStartTime = DateTime.Now.TimeOfDay;
 
                 foreach (string channel in selChannelArray)
                 {
