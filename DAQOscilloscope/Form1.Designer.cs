@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.pnlDaqConfig = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.lblADRateNum = new System.Windows.Forms.Label();
@@ -69,7 +69,9 @@
             this.mnuChart = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuChartClear = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuHelp = new System.Windows.Forms.ToolStripMenuItem();
-            this.sfdData = new System.Windows.Forms.SaveFileDialog();
+            this.sfdDataNew = new System.Windows.Forms.SaveFileDialog();
+            this.sfdDataAppend = new System.Windows.Forms.SaveFileDialog();
+            this.ofdData = new System.Windows.Forms.OpenFileDialog();
             this.pnlDaqConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.updSamplesPerChannel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.updSampleRate)).BeginInit();
@@ -349,21 +351,21 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chOscilloscope.BackColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea1.Name = "ChartArea1";
-            this.chOscilloscope.ChartAreas.Add(chartArea1);
-            legend1.DockedToChartArea = "ChartArea1";
-            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend1.IsDockedInsideChartArea = false;
-            legend1.LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Row;
-            legend1.Name = "Legend1";
-            this.chOscilloscope.Legends.Add(legend1);
+            chartArea3.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea3.Name = "ChartArea1";
+            this.chOscilloscope.ChartAreas.Add(chartArea3);
+            legend3.DockedToChartArea = "ChartArea1";
+            legend3.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend3.IsDockedInsideChartArea = false;
+            legend3.LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Row;
+            legend3.Name = "Legend1";
+            this.chOscilloscope.Legends.Add(legend3);
             this.chOscilloscope.Location = new System.Drawing.Point(362, 29);
             this.chOscilloscope.Name = "chOscilloscope";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chOscilloscope.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chOscilloscope.Series.Add(series3);
             this.chOscilloscope.Size = new System.Drawing.Size(528, 409);
             this.chOscilloscope.TabIndex = 19;
             // 
@@ -397,6 +399,7 @@
             this.mnuFileOpen.Name = "mnuFileOpen";
             this.mnuFileOpen.Size = new System.Drawing.Size(180, 22);
             this.mnuFileOpen.Text = "Open";
+            this.mnuFileOpen.Click += new System.EventHandler(this.MnuFileOpen_Click);
             // 
             // mnuFileSave
             // 
@@ -404,31 +407,31 @@
             this.mnuFileSaveNew,
             this.mnuFileSaveAppend});
             this.mnuFileSave.Name = "mnuFileSave";
-            this.mnuFileSave.Size = new System.Drawing.Size(180, 22);
+            this.mnuFileSave.Size = new System.Drawing.Size(103, 22);
             this.mnuFileSave.Text = "Save";
             // 
             // mnuFileSaveNew
             // 
             this.mnuFileSaveNew.Name = "mnuFileSaveNew";
-            this.mnuFileSaveNew.Size = new System.Drawing.Size(180, 22);
+            this.mnuFileSaveNew.Size = new System.Drawing.Size(116, 22);
             this.mnuFileSaveNew.Text = "New";
             this.mnuFileSaveNew.Click += new System.EventHandler(this.MnuFileSaveNew_Click);
             // 
             // mnuFileSaveAppend
             // 
             this.mnuFileSaveAppend.Name = "mnuFileSaveAppend";
-            this.mnuFileSaveAppend.Size = new System.Drawing.Size(180, 22);
+            this.mnuFileSaveAppend.Size = new System.Drawing.Size(116, 22);
             this.mnuFileSaveAppend.Text = "Append";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(100, 6);
             // 
             // mnuFileQuit
             // 
             this.mnuFileQuit.Name = "mnuFileQuit";
-            this.mnuFileQuit.Size = new System.Drawing.Size(180, 22);
+            this.mnuFileQuit.Size = new System.Drawing.Size(103, 22);
             this.mnuFileQuit.Text = "Quit";
             // 
             // mnuAcquire
@@ -467,9 +470,17 @@
             this.mnuHelp.Size = new System.Drawing.Size(44, 20);
             this.mnuHelp.Text = "Help";
             // 
-            // sfdData
+            // sfdDataNew
             // 
-            this.sfdData.FileOk += new System.ComponentModel.CancelEventHandler(this.SfdData_FileOk);
+            this.sfdDataNew.FileOk += new System.ComponentModel.CancelEventHandler(this.SfdDataNew_FileOk);
+            // 
+            // sfdDataAppend
+            // 
+            this.sfdDataAppend.FileOk += new System.ComponentModel.CancelEventHandler(this.SfdDataAppend_FileOk);
+            // 
+            // ofdData
+            // 
+            this.ofdData.FileOk += new System.ComponentModel.CancelEventHandler(this.ofdData_FileOk);
             // 
             // Frm1
             // 
@@ -541,7 +552,9 @@
         private System.Windows.Forms.ToolStripMenuItem mnuFileQuit;
         private System.Windows.Forms.ToolStripMenuItem mnuAcquireBegin;
         private System.Windows.Forms.ToolStripMenuItem mnuChartClear;
-        private System.Windows.Forms.SaveFileDialog sfdData;
+        private System.Windows.Forms.SaveFileDialog sfdDataNew;
+        private System.Windows.Forms.SaveFileDialog sfdDataAppend;
+        private System.Windows.Forms.OpenFileDialog ofdData;
     }
 }
 
