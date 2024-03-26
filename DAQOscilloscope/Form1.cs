@@ -16,6 +16,7 @@ namespace DAQOscilloscope
     public partial class Frm1 : Form
     {
         private Oscilloscope osc;
+        private OscilloscopeDataTable dt;
 
         // DAQ board specs
         private const double MAX_TIME = 9.0; // seconds
@@ -188,25 +189,29 @@ namespace DAQOscilloscope
             else
             {
                 SetUserInputEnabled(false);
-                osc.Acquire(GetDaqChannels(), GetSelectedChannels());
+                dt = osc.Acquire(GetDaqChannels(), GetSelectedChannels());
                 chOscilloscope.Series.Clear();
-                PlotData(GetTimeAxisValues(), osc.Data, GetSelectedChannels(), osc.MinimumVoltage, osc.MaximumVoltage);
+                //dt = new OscilloscopeDataTable(GetDaqChannels(), GetTimeAxisValues(), osc.Data);
+                PlotData(dt, osc.MinimumVoltage, osc.MaximumVoltage);
                 SetUserInputEnabled(true);
             }
         }
 
-        private void PlotData(double[] times, double[,] data, string[] channels, double minVoltage, double maxVoltage)
+        private void PlotData(OscilloscopeDataTable dt, double minVoltage, double maxVoltage)
         {
+            chOscilloscope.Series.Clear();
+            chOscilloscope.Titles.Clear();
+
             chOscilloscope.ChartAreas[0].AxisX.Title = "Time (s)";
             chOscilloscope.ChartAreas[0].AxisY.Title = "Voltage (V)";
             chOscilloscope.ChartAreas[0].AxisX.Minimum = 0;
-            chOscilloscope.ChartAreas[0].AxisY.Minimum = minVoltage * 1.1;
-            chOscilloscope.ChartAreas[0].AxisY.Maximum = maxVoltage * 1.1;
+            chOscilloscope.ChartAreas[0].AxisY.Minimum = minVoltage*1.1;
+            chOscilloscope.ChartAreas[0].AxisY.Maximum = maxVoltage*1.1;
 
-            chOscilloscope.Titles.Clear();
             chOscilloscope.Titles.Add("Voltage vs Time");
+
             int i = 0;
-            foreach (string channel in channels)
+            foreach (string channel in dt.Channels)
             {
                 /* Add a series to the chart for each channel added
                  */
@@ -214,26 +219,12 @@ namespace DAQOscilloscope
                 chOscilloscope.Series[channel].ChartType =
                     System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
 
-                for (int j = 0; j < data.GetLength(1); j++)
+                for (int j = 0; j < dt.DataPointsPerChannel; j++)
                 {
-                    chOscilloscope.Series[channel].Points.AddXY(times[j], data[i, j]);
+                    chOscilloscope.Series[channel].Points.AddXY(dt.Times[j], dt.Data[i, j]);
                 }
                 i++;
             }
-        }
-
-        private double[] GetTimeAxisValues()
-        {
-            int dataLength = osc.Data.GetLength(1);
-            double[] times = new double[dataLength];
-            double stopTime = CalcAcquisitionTime();
-
-            for (int i = 0; i < dataLength; i++)
-            {
-                times[i] = (double)(i+1) / dataLength * stopTime;
-            }
-
-            return times;
         }
 
         private double CalcAcquisitionTime()
@@ -304,129 +295,35 @@ namespace DAQOscilloscope
 
         private void SfdDataNew_FileOk(object sender, CancelEventArgs e)
         {
-            WriteFile(false);
+            dt.WriteFile(sfdDataNew.FileName, false);
         }
 
         private void SfdDataAppend_FileOk(object sender, CancelEventArgs e)
         {
-            WriteFile(true);
+            dt.WriteFile(sfdDataAppend.FileName, true);
         }
 
-        private void ofdData_FileOk(object sender, CancelEventArgs e)
+        private void OfdData_FileOk(object sender, CancelEventArgs e)
         {
-            if (System.IO.File.Exists(ofdData.FileName))
-            {
-                string l; // line of text
-                int dataPoints = 0;
-                double minVoltage = 0;
-                double maxVoltage = 0;
-                List<double> times = new List<double>();
-                List<string> channels = new List<string>();
-
-                System.IO.StreamReader objReader = new System.IO.StreamReader(ofdData.FileName);
-
-                // Read header (4 lines)
-                for (int i = 1; i <= 4; i++)
-                {
-                    l = objReader.ReadLine();
-                    switch (i)
-                    {
-                        case 1: // Date
-                            break;
-                        case 2: // Time
-                            break;
-                        case 3: // # Data Points
-                            string[] ls = l.Trim(',').Split(',');
-                            int.TryParse(ls[1], out dataPoints);
-                            break;
-                        case 4: // Column headers
-                            string[] columns = l.Trim(',').Split(',');
-                            for (int j = 1; j < columns.Length; j++)
-                            {
-                                channels.Add(columns[j]);
-                            }
-                            break;
-                    }
-                }
-
-                // Read data points
-                if (dataPoints > 0)
-                {
-                    double[,] data = new double[channels.Count, dataPoints];
-
-                    // Add data points in each row to channels
-                    for (int i = 0; i < dataPoints; i++)
-                    {
-                        double num;
-                        string[] ls = objReader.ReadLine().Trim(',').Split(',');
-
-                        // Add first data point (time of data point)
-                        if (double.TryParse(ls[0], out num))
-                        {
-                            times.Add(num);
-                        }
-
-                        // Add rest of data points for each channel
-                        for (int j = 1; j < channels.Count; j++)
-                        {
-                            if (double.TryParse(ls[j], out num))
-                            {
-                                data[j - 1, i] = num;
-                                if (num < minVoltage) minVoltage = num;
-                                if (num > maxVoltage) maxVoltage = num;
-                            }
-                        }
-                    }
-
-                    PlotData(times.ToArray(), data, channels.ToArray(), minVoltage, maxVoltage);
-                }
-
-                objReader.Close();
-            }
-        }
-
-        private void WriteFile(bool append)
-        {
-            try
-            {
-                System.IO.StreamWriter objWriter = new System.IO.StreamWriter(sfdDataNew.FileName, append);
-
-                // File header
-                objWriter.WriteLine($"Date,{osc.DataStartDate}");
-                objWriter.WriteLine($"Time,{osc.DataStartTime}");
-                objWriter.WriteLine($"# Data Points,{osc.Data.GetLength(1)}");
-
-                // Column headers
-                objWriter.Write("Elapsed Time,");
-                for (int i = 0; i < osc.DataChannels.Length; i++)
-                {
-                    objWriter.Write($"{osc.DataChannels[i]},");
-                }
-                objWriter.Write("\r\n");
-
-                // Write row of data
-                for (int i = 0; i < osc.Data.GetLength(1); i++)
-                {
-                    objWriter.Write($"{(double)i / osc.SampleRate},");
-                    // Write columns of data
-                    for (int j = 0; j < osc.Data.GetLength(0); j++)
-                    {
-                        objWriter.Write($"{osc.Data[j, i]},");
-                    }
-                    objWriter.Write("\r\n");
-                }
-
-                objWriter.Close();
-            }
-            catch (System.IO.IOException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            double minVoltage;
+            double maxVoltage;
+            dt = new OscilloscopeDataTable(ofdData.FileName, out minVoltage, out maxVoltage);
+            PlotData(dt, minVoltage, maxVoltage);
         }
 
         private void MnuFileOpen_Click(object sender, EventArgs e)
         {
             ofdData.ShowDialog();
+        }
+
+        private void MnuAbout_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show($"Visit the GitHub page at https://github.com/gardenbehindtheworld/DAQOscilloscope");
+        }
+
+        private void MnuFileSaveAppend_Click(object sender, EventArgs e)
+        {
+            sfdDataAppend.ShowDialog();
         }
     }
 }

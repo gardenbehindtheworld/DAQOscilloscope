@@ -21,8 +21,6 @@ namespace DAQOscilloscope
 
         // Data collection
         public double[,] Data { get; private set; }
-        public DateTime DataStartDate { get; private set; }
-        public TimeSpan DataStartTime { get; private set; }
         public string[] DataChannels { get; private set; }
 
         public int SamplesPerChannel { get; set; }
@@ -33,9 +31,10 @@ namespace DAQOscilloscope
 
         }
 
-        public double[,] Acquire(string[] channelArray, string[] selChannelArray)
+        public OscilloscopeDataTable Acquire(string[] channelArray, string[] selChannelArray)
         {
             analogReadTask = new NationalInstruments.DAQmx.Task();
+            DateTime startDate;
 
             if (channelArray.Length == 0)
             {
@@ -44,8 +43,7 @@ namespace DAQOscilloscope
             else
             {
                 DataChannels = selChannelArray;
-                DataStartDate = DateTime.Now.Date;
-                DataStartTime = DateTime.Now.TimeOfDay;
+                startDate = DateTime.Now.Date;
 
                 foreach (string channel in selChannelArray)
                 {
@@ -81,7 +79,7 @@ namespace DAQOscilloscope
                 catch (DaqException ex) { MessageBox.Show(ex.Message); }
             }
             this.DisposeTask();
-            return Data;
+            return new OscilloscopeDataTable(selChannelArray, SamplesPerChannel, SampleRate, Data, startDate);
         }
 
         public void SetVoltageRange(double min, double max)
