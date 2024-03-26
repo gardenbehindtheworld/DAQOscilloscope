@@ -325,5 +325,10 @@ namespace DAQOscilloscope
         {
             sfdDataAppend.ShowDialog();
         }
+
+        private void mnuFile_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

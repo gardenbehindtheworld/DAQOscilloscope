@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.pnlDaqConfig = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.lblADRateNum = new System.Windows.Forms.Label();
@@ -352,21 +352,21 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chOscilloscope.BackColor = System.Drawing.Color.Transparent;
-            chartArea1.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea1.Name = "ChartArea1";
-            this.chOscilloscope.ChartAreas.Add(chartArea1);
-            legend1.DockedToChartArea = "ChartArea1";
-            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend1.IsDockedInsideChartArea = false;
-            legend1.LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Row;
-            legend1.Name = "Legend1";
-            this.chOscilloscope.Legends.Add(legend1);
+            chartArea2.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea2.Name = "ChartArea1";
+            this.chOscilloscope.ChartAreas.Add(chartArea2);
+            legend2.DockedToChartArea = "ChartArea1";
+            legend2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend2.IsDockedInsideChartArea = false;
+            legend2.LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Row;
+            legend2.Name = "Legend1";
+            this.chOscilloscope.Legends.Add(legend2);
             this.chOscilloscope.Location = new System.Drawing.Point(362, 29);
             this.chOscilloscope.Name = "chOscilloscope";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chOscilloscope.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chOscilloscope.Series.Add(series2);
             this.chOscilloscope.Size = new System.Drawing.Size(528, 409);
             this.chOscilloscope.TabIndex = 19;
             // 
@@ -393,13 +393,14 @@
             this.mnuFileQuit});
             this.mnuFile.Name = "mnuFile";
             this.mnuFile.Size = new System.Drawing.Size(37, 20);
-            this.mnuFile.Text = "File";
+            this.mnuFile.Text = "&File";
+            this.mnuFile.Click += new System.EventHandler(this.mnuFile_Click);
             // 
             // mnuFileOpen
             // 
             this.mnuFileOpen.Name = "mnuFileOpen";
             this.mnuFileOpen.Size = new System.Drawing.Size(180, 22);
-            this.mnuFileOpen.Text = "Open";
+            this.mnuFileOpen.Text = "&Open";
             this.mnuFileOpen.Click += new System.EventHandler(this.MnuFileOpen_Click);
             // 
             // mnuFileSave
@@ -409,20 +410,20 @@
             this.mnuFileSaveAppend});
             this.mnuFileSave.Name = "mnuFileSave";
             this.mnuFileSave.Size = new System.Drawing.Size(180, 22);
-            this.mnuFileSave.Text = "Save";
+            this.mnuFileSave.Text = "&Save";
             // 
             // mnuFileSaveNew
             // 
             this.mnuFileSaveNew.Name = "mnuFileSaveNew";
             this.mnuFileSaveNew.Size = new System.Drawing.Size(180, 22);
-            this.mnuFileSaveNew.Text = "New";
+            this.mnuFileSaveNew.Text = "&New";
             this.mnuFileSaveNew.Click += new System.EventHandler(this.MnuFileSaveNew_Click);
             // 
             // mnuFileSaveAppend
             // 
             this.mnuFileSaveAppend.Name = "mnuFileSaveAppend";
             this.mnuFileSaveAppend.Size = new System.Drawing.Size(180, 22);
-            this.mnuFileSaveAppend.Text = "Append";
+            this.mnuFileSaveAppend.Text = "&Append";
             this.mnuFileSaveAppend.Click += new System.EventHandler(this.MnuFileSaveAppend_Click);
             // 
             // toolStripSeparator1
@@ -434,7 +435,7 @@
             // 
             this.mnuFileQuit.Name = "mnuFileQuit";
             this.mnuFileQuit.Size = new System.Drawing.Size(180, 22);
-            this.mnuFileQuit.Text = "Quit";
+            this.mnuFileQuit.Text = "&Quit";
             // 
             // mnuAcquire
             // 
@@ -442,13 +443,13 @@
             this.mnuAcquireBegin});
             this.mnuAcquire.Name = "mnuAcquire";
             this.mnuAcquire.Size = new System.Drawing.Size(60, 20);
-            this.mnuAcquire.Text = "Acquire";
+            this.mnuAcquire.Text = "&Acquire";
             // 
             // mnuAcquireBegin
             // 
             this.mnuAcquireBegin.Name = "mnuAcquireBegin";
             this.mnuAcquireBegin.Size = new System.Drawing.Size(180, 22);
-            this.mnuAcquireBegin.Text = "Begin acquisition";
+            this.mnuAcquireBegin.Text = "Begin &acquisition";
             this.mnuAcquireBegin.Click += new System.EventHandler(this.MnuAcquireBegin_Click);
             // 
             // mnuChart
@@ -457,13 +458,13 @@
             this.mnuChartClear});
             this.mnuChart.Name = "mnuChart";
             this.mnuChart.Size = new System.Drawing.Size(48, 20);
-            this.mnuChart.Text = "Chart";
+            this.mnuChart.Text = "&Chart";
             // 
             // mnuChartClear
             // 
             this.mnuChartClear.Name = "mnuChartClear";
-            this.mnuChartClear.Size = new System.Drawing.Size(131, 22);
-            this.mnuChartClear.Text = "Clear chart";
+            this.mnuChartClear.Size = new System.Drawing.Size(180, 22);
+            this.mnuChartClear.Text = "&Clear chart";
             this.mnuChartClear.Click += new System.EventHandler(this.MnuChartClear_Click);
             // 
             // mnuHelp
@@ -472,13 +473,13 @@
             this.mnuAbout});
             this.mnuHelp.Name = "mnuHelp";
             this.mnuHelp.Size = new System.Drawing.Size(44, 20);
-            this.mnuHelp.Text = "Help";
+            this.mnuHelp.Text = "&Help";
             // 
             // mnuAbout
             // 
             this.mnuAbout.Name = "mnuAbout";
-            this.mnuAbout.Size = new System.Drawing.Size(107, 22);
-            this.mnuAbout.Text = "About";
+            this.mnuAbout.Size = new System.Drawing.Size(180, 22);
+            this.mnuAbout.Text = "&About";
             this.mnuAbout.Click += new System.EventHandler(this.MnuAbout_Click);
             // 
             // sfdDataNew
