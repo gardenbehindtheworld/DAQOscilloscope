@@ -281,6 +281,9 @@ namespace DAQOscilloscope
             cboVoltageRange.Refresh();
             updSampleRate.Enabled = enableDisable;
             updSamplesPerChannel.Enabled = enableDisable;
+
+            mnuAcquire.Enabled = enableDisable;
+            mnuFileSave.Enabled = enableDisable;
         }
 
         private void Frm1_FormClosed(object sender, FormClosedEventArgs e)
@@ -305,10 +308,23 @@ namespace DAQOscilloscope
 
         private void OfdData_FileOk(object sender, CancelEventArgs e)
         {
+            dt = null;
             double minVoltage;
             double maxVoltage;
-            dt = new OscilloscopeDataTable(ofdData.FileName, out minVoltage, out maxVoltage);
-            PlotData(dt, minVoltage, maxVoltage);
+            try
+            {
+                dt = new OscilloscopeDataTable(ofdData.FileName, out minVoltage, out maxVoltage);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            
+            if (dt != null)
+            {
+                PlotData(dt, minVoltage, maxVoltage);
+            }
         }
 
         private void MnuFileOpen_Click(object sender, EventArgs e)
@@ -326,9 +342,9 @@ namespace DAQOscilloscope
             sfdDataAppend.ShowDialog();
         }
 
-        private void mnuFile_Click(object sender, EventArgs e)
+        private void MnuFileQuit_Click(object sender, EventArgs e)
         {
-
+            this.Close();
         }
     }
 }

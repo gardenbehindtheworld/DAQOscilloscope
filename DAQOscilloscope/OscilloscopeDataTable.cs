@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
@@ -98,13 +99,23 @@ namespace DAQOscilloscope
                                     if (num > maxVoltage) maxVoltage = num;
                                 }
                             }
+
+                        }
+
+                        Debug.WriteLine(objReader.Peek());
+
+                        // Close out if there is more data than specified
+                        if (objReader.Peek() != -1)
+                        {
+                            objReader.Close();
+                            throw new Exception("The file data is not valid.");
                         }
                     }
 
                     objReader.Close();
                 }
             }
-            catch (Exception ex)
+            catch (System.IO.IOException ex)
             {
                 MessageBox.Show(ex.Message);
                 return;
